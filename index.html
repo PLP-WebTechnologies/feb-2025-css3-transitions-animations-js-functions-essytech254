@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Theme Preferences</title>
+  <style>
+    :root {
+      --primary-color: #4a6fa5;
+      --secondary-color: #ff6b6b;
+      --text-color: #333;
+      --bg-color: #f5f5f5;
+      --card-bg: #ffffff;
+      --transition-speed: 0.3s;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: background-color var(--transition-speed), color var(--transition-speed);
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    h1 {
+      color: var(--primary-color);
+      transition: color var(--transition-speed);
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      transition: transform var(--transition-speed), box-shadow var(--transition-speed), background-color var(--transition-speed);
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+    }
+
+    .card h2 {
+      color: var(--primary-color);
+      margin-top: 0;
+      transition: color var(--transition-speed);
+    }
+
+    .control-panel {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    button {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 0.75rem 1.5rem;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color var(--transition-speed), transform 0.2s, box-shadow 0.2s;
+    }
+
+    button:hover {
+      background-color: rgba(74, 111, 165, 0.9);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .theme-button {
+      margin-right: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .animation-container {
+      display: flex;
+      justify-content: center;
+      margin: 2rem 0;
+    }
+
+    .animated-box {
+      width: 100px;
+      height: 100px;
+      background-color: var(--secondary-color);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      transition: background-color var(--transition-speed);
+    }
+
+    /* Animations */
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes rotate {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      75% { transform: translateX(10px); }
+    }
+
+    .pulse {
+      animation: pulse 2s infinite ease-in-out;
+    }
+
+    .rotate {
+      animation: rotate 3s infinite linear;
+    }
+
+    .bounce {
+      animation: bounce 1s infinite ease-in-out;
+    }
+
+    .shake {
+      animation: shake 0.5s infinite;
+    }
+
+    .animation-paused {
+      animation-play-state: paused;
+    }
+
+    /* Dark theme */
+    body.dark-theme {
+      --primary-color: #7ca3e0;
+      --secondary-color: #ff8585;
+      --text-color: #e0e0e0;
+      --bg-color: #222;
+      --card-bg: #333;
+    }
+
+    /* Speed controls */
+    .speed-control {
+      display: flex;
+      align-items: center;
+      margin-top: 1rem;
+    }
+
+    .speed-control label {
+      margin-right: 1rem;
+    }
+
+    /* Toast notification */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: var(--primary-color);
+      color: white;
+      padding: 1rem;
+      border-radius: 4px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0, 0.1);
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.3s, transform 0.3s;
+      z-index: 1000;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Settings form */
+    .settings-form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: bold;
+    }
+    
+    .form-group select, .form-group input {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background-color: var(--card-bg);
+      color: var(--text-color);
+      transition: border-color var(--transition-speed), background-color var(--transition-speed), color var(--transition-speed);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Interactive Theme & Animation Preferences</h1>
+      <p>Play with animations and save your preferences using localStorage</p>
+    </header>
+
+    <div class="card">
+      <h2>Theme Settings</h2>
+      <div class="control-panel">
+        <button id="lightTheme" class="theme-button">Light Theme</button>
+        <button id="darkTheme" class="theme-button">Dark Theme</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Animation Demo</h2>
+      <div class="animation-container">
+        <div id="animatedBox" class="animated-box pulse">Animate Me!</div>
+      </div>
+      
+      <div class="control-panel">
+        <button id="pulseBtn" class="animation-button">Pulse</button>
+        <button id="rotateBtn" class="animation-button">Rotate</button>
+        <button id="bounceBtn" class="animation-button">Bounce</button>
+        <button id="shakeBtn" class="animation-button">Shake</button>
+        <button id="pauseBtn">Pause/Play</button>
+      </div>
+      
+      <div class="speed-control">
+        <label for="animationSpeed">Animation Speed:</label>
+        <input type="range" id="animationSpeed" min="0.5" max="3" step="0.1" value="1">
+        <span id="speedValue">1x</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>User Preferences</h2>
+      <div class="settings-form">
+        <div class="form-group">
+          <label for="defaultTheme">Default Theme</label>
+          <select id="defaultTheme">
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="defaultAnimation">Default Animation</label>
+          <select id="defaultAnimation">
+            <option value="pulse">Pulse</option>
+            <option value="rotate">Rotate</option>
+            <option value="bounce">Bounce</option>
+            <option value="shake">Shake</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="userName">Your Name</label>
+          <input type="text" id="userName" placeholder="Enter your name">
+        </div>
+        <div class="form-group">
+          <label for="defaultSpeed">Default Speed</label>
+          <input type="number" id="defaultSpeed" min="0.5" max="3" step="0.1" value="1">
+        </div>
+      </div>
+      <button id="savePreferences">Save Preferences</button>
+      <button id="clearPreferences">Clear Preferences</button>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    // DOM Elements
+    const body = document.body;
+    const animatedBox = document.getElementById('animatedBox');
+    const lightThemeBtn = document.getElementById('lightTheme');
+    const darkThemeBtn = document.getElementById('darkTheme');
+    const pulseBtn = document.getElementById('pulseBtn');
+    const rotateBtn = document.getElementById('rotateBtn');
+    const bounceBtn = document.getElementById('bounceBtn');
+    const shakeBtn = document.getElementById('shakeBtn');
+    const pauseBtn = document.getElementById('pauseBtn');
+    const animationSpeed = document.getElementById('animationSpeed');
+    const speedValue = document.getElementById('speedValue');
+    const savePreferencesBtn = document.getElementById('savePreferences');
+    const clearPreferencesBtn = document.getElementById('clearPreferences');
+    const toast = document.getElementById('toast');
+    const defaultThemeSelect = document.getElementById('defaultTheme');
+    const defaultAnimationSelect = document.getElementById('defaultAnimation');
+    const userNameInput = document.getElementById('userName');
+    const defaultSpeedInput = document.getElementById('defaultSpeed');
+
+    // Current animation state
+    let currentAnimation = 'pulse';
+    let isAnimationPaused = false;
+
+    // Function to show toast notification
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add('show');
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    // Theme switching functions
+    function setLightTheme() {
+      body.classList.remove('dark-theme');
+      showToast('Light theme applied');
+    }
+
+    function setDarkTheme() {
+      body.classList.add('dark-theme');
+      showToast('Dark theme applied');
+    }
+
+    // Animation functions
+    function setAnimation(animation) {
+      // Remove all animation classes
+      animatedBox.classList.remove('pulse', 'rotate', 'bounce', 'shake');
+      
+      // Add the selected animation class
+      animatedBox.classList.add(animation);
+      currentAnimation = animation;
+      
+      showToast(`${animation.charAt(0).toUpperCase() + animation.slice(1)} animation applied`);
+    }
+
+    function togglePause() {
+      if (isAnimationPaused) {
+        animatedBox.classList.remove('animation-paused');
+        isAnimationPaused = false;
+        showToast('Animation resumed');
+      } else {
+        animatedBox.classList.add('animation-paused');
+        isAnimationPaused = true;
+        showToast('Animation paused');
+      }
+    }
+
+    function setAnimationSpeed() {
+      const speed = animationSpeed.value;
+      document.documentElement.style.setProperty('--transition-speed', `${0.3 / speed}s`);
+      animatedBox.style.animationDuration = `${speed === '1' ? '' : speed}s`;
+      speedValue.textContent = `${speed}x`;
+    }
+
+    // Local Storage functions
+    function saveToLocalStorage(key, value) {
+      localStorage.setItem(key, value);
+    }
+
+    function getFromLocalStorage(key, defaultValue) {
+      return localStorage.getItem(key) || defaultValue;
+    }
+
+    function savePreferences() {
+      const preferences = {
+        theme: defaultThemeSelect.value,
+        animation: defaultAnimationSelect.value,
+        userName: userNameInput.value,
+        speed: defaultSpeedInput.value
+      };
+      
+      saveToLocalStorage('userPreferences', JSON.stringify(preferences));
+      showToast('Preferences saved successfully!');
+    }
+
+    function loadPreferences() {
+      const savedPreferences = getFromLocalStorage('userPreferences', null);
+      
+      if (savedPreferences) {
+        const preferences = JSON.parse(savedPreferences);
+        
+        // Apply saved preferences
+        defaultThemeSelect.value = preferences.theme;
+        defaultAnimationSelect.value = preferences.animation;
+        userNameInput.value = preferences.userName;
+        defaultSpeedInput.value = preferences.speed;
+        
+        // Apply theme
+        if (preferences.theme === 'dark') {
+          setDarkTheme();
+        } else {
+          setLightTheme();
+        }
+        
+        // Apply animation
+        setAnimation(preferences.animation);
+        
+        // Set speed
+        animationSpeed.value = preferences.speed;
+        setAnimationSpeed();
+        
+        // Show welcome message
+        if (preferences.userName) {
+          showToast(`Welcome back, ${preferences.userName}!`);
+        }
+      }
+    }
+
+    function clearPreferences() {
+      localStorage.removeItem('userPreferences');
+      defaultThemeSelect.value = 'light';
+      defaultAnimationSelect.value = 'pulse';
+      userNameInput.value = '';
+      defaultSpeedInput.value = '1';
+      showToast('Preferences cleared');
+      
+      // Reset to defaults
+      setLightTheme();
+      setAnimation('pulse');
+      animationSpeed.value = 1;
+      setAnimationSpeed();
+    }
+
+    // Event Listeners
+    lightThemeBtn.addEventListener('click', setLightTheme);
+    darkThemeBtn.addEventListener('click', setDarkTheme);
+    
+    pulseBtn.addEventListener('click', () => setAnimation('pulse'));
+    rotateBtn.addEventListener('click', () => setAnimation('rotate'));
+    bounceBtn.addEventListener('click', () => setAnimation('bounce'));
+    shakeBtn.addEventListener('click', () => setAnimation('shake'));
+    
+    pauseBtn.addEventListener('click', togglePause);
+    
+    animationSpeed.addEventListener('input', setAnimationSpeed);
+    
+    savePreferencesBtn.addEventListener('click', savePreferences);
+    clearPreferencesBtn.addEventListener('click', clearPreferences);
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', loadPreferences);
+  </script>
+</body>
+</html>
